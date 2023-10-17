@@ -31,7 +31,7 @@ class DataVisualizer:
     def visualize_label_distribution(self):
         sentiment_distribution = self.data[1].value_counts() # labels in the second column
         sentiment_distribution.plot(kind='bar')
-        plt.xlabel('Sentiment Labels')
+        plt.xlabel('Labels')
         plt.ylabel('Count')
         plt.show()
        
