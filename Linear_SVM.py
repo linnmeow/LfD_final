@@ -13,15 +13,17 @@ import wandb
 
 def create_arg_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-tf", "--train_file", default='data/train.txt', type=str,
-                        help="Train file to learn from (default train.txt)")
-    parser.add_argument("-df", "--dev_file", default='data/dev.txt', type=str,
-                        help="Dev file to evaluate on (default dev.txt)")
+    parser.add_argument("-tf", "--train_file", default='data/train.tsv', type=str,
+                        help="Train file to learn from (default train.tsv)")
+    parser.add_argument("-df", "--dev_file", default='data/dev.tsv', type=str,
+                        help="Dev file to evaluate on (default dev.tsv)")
+    parser.add_argument("-svm1", "--svm1", action="store_true",
+                        help="Use baseline Linear SVM")
     args = parser.parse_args()
     return args
 
 
-def read_corpus(corpus_file, use_sentiment):
+def read_corpus(corpus_file):
     '''TODO: add function description'''
     '''TODO: Change this to fit our current data'''
     documents = []
@@ -29,13 +31,10 @@ def read_corpus(corpus_file, use_sentiment):
     with open(corpus_file, encoding='utf-8') as in_file:
         for line in in_file:
             tokens = line.strip().split()
-            documents.append(tokens[3:])
-            if use_sentiment:
-                # 2-class problem: positive vs negative
-                labels.append(tokens[1])
-            else:
-                # 6-class problem: books, camera, dvd, health, music, software
-                labels.append(tokens[0])
+
+            documents.append(tokens[:-1])
+            labels.append(tokens[-1])
+
     return documents, labels
 
 def identity(inp):
@@ -49,8 +48,8 @@ if __name__ == "__main__":
     args = create_arg_parser()
 
     # TODO: comment
-    X_train, Y_train = read_corpus(args.train_file, args.sentiment)
-    X_test, Y_test = read_corpus(args.dev_file, args.sentiment)
+    X_train, Y_train = read_corpus(args.train_file)
+    X_test, Y_test = read_corpus(args.dev_file)
 
     # Convert the texts to vectors
     # We use a dummy function as tokenizer and preprocessor,
@@ -60,10 +59,10 @@ if __name__ == "__main__":
     vec = CountVectorizer(preprocessor=identity, tokenizer=identity)
     vec_name = "CountVectorizer"
 
+        # create an empty list to store the classifiers (Lin 12.09.23)
+
     classifiers = []
     if args.svm1:
-        classifiers.append(("Normal SVM", SVC()))
-    if args.svm2:
         classifiers.append(("Linear SVM", LinearSVC()))
     
     # Iterate through the list of classifiers and apply each one with the selected vectorizer (Lin 12.09.23)
