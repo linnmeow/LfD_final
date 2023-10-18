@@ -19,10 +19,10 @@ class Preprocessor:
         assert isinstance(text, str), "This function only takes strings."
         text = text.lower()
         text = re.sub(r'@user\s*', '', text) # there is whitespce after @USER, input already been lowercased
-        text = text.replace('URL', '')
-        text = re.sub(f"[{re.escape(string.punctuation)}]", '', text)  # remove punctuation
-        text = re.sub('[^A-Za-z ]+', '', text)  # remove everything that isn't letters
+        text = re.sub(r'url\s*', '', text)
         text = emoji.demojize(text)  # convert emojis to text
+        text = re.sub(r'::', ': :', text) # add spaces after each emoji representation
+        text = re.sub('[^A-Za-z ]+', '', text)  # remove everything that isn't letters including punctuation
         text = text.strip()
         return text
 
@@ -35,8 +35,8 @@ class Preprocessor:
         self.data.to_csv(output_file, sep='\t', header=False, index=False) 
 
 
-input_tsv_file = "dev.tsv"
-output_tsv_file = "dev_clean.tsv"
+input_tsv_file = "test.tsv"
+output_tsv_file = "test_clean.tsv"
 
 preprocessor = Preprocessor(input_tsv_file)
 preprocessor.remove_frequent_words()
