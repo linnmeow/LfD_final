@@ -37,7 +37,7 @@ class DataVisualizer:
        
 
 if __name__ == "__main__":
-    file_path = 'data/dev.tsv'
+    file_path = 'train.tsv'
     visualizer = DataVisualizer(file_path)
     visualizer.visualize_word_cloud()
     visualizer.visualize_word_frequencies()
