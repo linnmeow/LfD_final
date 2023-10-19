@@ -25,3 +25,7 @@ someone shouldvetaken this piece of shit to a volcano facewithtearsofjoy	OFF
 obama wanted liberals amp illegals to move into red states	NOT
 liberals are all kookoo	OFF
 oh noes tough shit	OFF
+
+Linnnn 19.10:
+added train and dev datasets with sentiment labels (neg, pos, neu)
+added sentiment_analyzer.py that performs this
