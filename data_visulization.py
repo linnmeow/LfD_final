@@ -34,9 +34,9 @@ class DataVisualizer:
         plt.xlabel('Labels')
         plt.ylabel('Count')
         plt.show()
-       
-
+    
 if __name__ == "__main__":
+
     file_path = 'train.tsv'
     visualizer = DataVisualizer(file_path)
     visualizer.visualize_word_cloud()
