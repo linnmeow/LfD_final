@@ -28,11 +28,6 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
 
-TRAIN_PATH = "data/train.tsv"
-DEV_PATH = "data/dev.tsv"
-TEST_PATH = "data/test.tsv"
-
-
 # Random seed for reproducibility
 np.random.seed(1234)
 tf.random.set_seed(1234)
@@ -44,9 +39,9 @@ def create_arg_parser() -> argparse.Namespace:
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-i", "--train_file", default="train.txt", type=str,
+    parser.add_argument("-i", "--train_file", default="data/train.tsv", type=str,
                         help="Input file to learn from (default train.txt)")
-    parser.add_argument("-d", "--dev_file", type=str, default="dev.txt",
+    parser.add_argument("-d", "--dev_file", type=str, default="data/dev.tsv",
                         help="Separate dev set to read in (default dev.txt)")
     parser.add_argument("-t", "--test_file", type=str,
                         help="If added, use trained model to predict on test set")
@@ -65,10 +60,13 @@ def read_corpus(corpus_file: str) -> tuple[list[str], list[str]]:
 
     with open(corpus_file, encoding="utf-8") as f:
         for line in f:
-            # tokens = line.strip()
-            document, label = line.strip().split("\t")
-            documents.append(document)
+            tokens = line.split()
+            
+            label = tokens[-1]
+            tweet = ' '.join(tokens[:-1])
+            documents.append(tweet)
             labels.append(label)
+
 
     return documents, labels
 
@@ -116,11 +114,8 @@ def create_model(Y_train: list[str], emb_matrix) -> Sequential:
     model.add(
         Embedding(num_tokens, embedding_dim, embeddings_initializer=Constant(emb_matrix), trainable=False)
     )
-    model.add(
-        Bidirectional(LSTM(units=HIDDEN_UNITS, return_sequences=False, recurrent_dropout=0.1))
-    )
-    model.add(Dropout(0.1))
-    model.add(Dense(1, activation="sigmoid"))
+
+    model.add(Dense(input_dim=embedding_dim, units=1, activation='sigmoid'))
 
     model.compile(loss=LOSS_FUNCTION, optimizer=OPTIM, metrics=["accuracy"])
 
@@ -134,7 +129,7 @@ def train_model(model: Sequential,
 
     VERBOSE = 1
     BATCH_SIZE = 25
-    EPOCHS = 5
+    EPOCHS = 1
 
     callback = EarlyStopping(monitor="val_loss", patience=3)
     model.fit(
@@ -148,7 +143,6 @@ def train_model(model: Sequential,
     )
     test_set_predict(model, X_dev, Y_dev, "dev")
 
-    print(model.summary())
     return model
 
 
@@ -177,6 +171,7 @@ def main() -> None:
     # Read in the data and embeddings
     X_train, Y_train = read_corpus(args.train_file)
     X_dev, Y_dev = read_corpus(args.dev_file)
+    
     embeddings = read_embeddings(args.embeddings)
 
     # Transform words to indices using a vectorizer
