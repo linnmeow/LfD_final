@@ -21,13 +21,13 @@ class SentimentAnalyzer:
         sentiment = self.sentiment_analyzer.polarity_scores(text)
         compound_score = sentiment['compound']
 
-        # split sentiment into NEG and NON (non-negative)
-        if compound_score <= -0.05:
-            sentiment_label = 'NEG'
-        else:
-            sentiment_label = 'POS' # treat all non negative as positive sentiment
+        # # split sentiment into NEG and NON (non-negative)
+        # if compound_score <= -0.05:
+        #     sentiment_label = 'NEG'
+        # else:
+        #     sentiment_label = 'POS' # treat all non negative as positive sentiment
 
-        return sentiment_label
+        return compound_score
     
     def analyze_sentiment_and_store(self):
         # add a new column 'Sentiment' to the DataFrame
@@ -36,9 +36,9 @@ class SentimentAnalyzer:
 
 if __name__ == "__main__":
 
-    analyzer = SentimentAnalyzer('train_clean.tsv')
+    analyzer = SentimentAnalyzer('dev_clean.tsv')
     analyzer.analyze_sentiment_and_store()
     
     # save the DataFrame with the 'Sentiment' column to a new TSV file
-    analyzer.data.to_csv('train_with_sentiment.tsv', sep='\t', index=False)
+    analyzer.data.to_csv('dev_with_sentiment.tsv', sep='\t', index=False)
 
