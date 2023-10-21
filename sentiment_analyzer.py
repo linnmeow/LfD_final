@@ -20,13 +20,7 @@ class SentimentAnalyzer:
         # analyze sentiment using NLTK's VADER
         sentiment = self.sentiment_analyzer.polarity_scores(text)
         compound_score = sentiment['compound']
-
-        # # split sentiment into NEG and NON (non-negative)
-        # if compound_score <= -0.05:
-        #     sentiment_label = 'NEG'
-        # else:
-        #     sentiment_label = 'POS' # treat all non negative as positive sentiment
-
+        
         return compound_score
     
     def analyze_sentiment_and_store(self):
