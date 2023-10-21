@@ -21,12 +21,11 @@ class SentimentAnalyzer:
         sentiment = self.sentiment_analyzer.polarity_scores(text)
         compound_score = sentiment['compound']
 
-        if compound_score >= 0.05:
-            sentiment_label = 'POS'
-        elif compound_score <= -0.05:
+        # split sentiment into NEG and NON (non-negative)
+        if compound_score <= -0.05:
             sentiment_label = 'NEG'
         else:
-            sentiment_label = 'NEU'
+            sentiment_label = 'NON'
 
         return sentiment_label
     
