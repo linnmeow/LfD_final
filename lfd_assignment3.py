@@ -1,30 +1,23 @@
 #!/usr/bin/env python
 
 
-"""Module for training and evaluating the LSTM model.
-
-Hyperparameters are to be specified in the code. Optimal values already set.
-The code also produces a confusion matrix.
-
-Example usage:
->>> python3 lstm.py -i train.txt -d dev.txt -t test.txt
-"""
+'''TODO: add high-level description of this Python script'''
 
 
 import json
 import argparse
-import pickle
 import random as py_random
+import wandb
+from sklearn.metrics import confusion_matrix
 
 import numpy as np
 import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense, Embedding, LSTM, Bidirectional, Dropout
 from keras.initializers import Constant
-from sklearn.metrics import accuracy_score, recall_score, precision_score, precision_recall_curve, f1_score, confusion_matrix
+from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import LabelBinarizer
-from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.optimizers import SGD, Adam, Adadelta, Adagrad
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
 
@@ -39,9 +32,9 @@ def create_arg_parser() -> argparse.Namespace:
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-i", "--train_file", default="data/train_clean.tsv", type=str,
-                        help="Input file to learn from (default train_clean.txt)")
-    parser.add_argument("-d", "--dev_file", type=str, default="data/dev_clean.tsv",
+    parser.add_argument("-i", "--train_file", default="train.txt", type=str,
+                        help="Input file to learn from (default train.txt)")
+    parser.add_argument("-d", "--dev_file", type=str, default="dev.txt",
                         help="Separate dev set to read in (default dev.txt)")
     parser.add_argument("-t", "--test_file", type=str,
                         help="If added, use trained model to predict on test set")
@@ -60,24 +53,22 @@ def read_corpus(corpus_file: str) -> tuple[list[str], list[str]]:
 
     with open(corpus_file, encoding="utf-8") as f:
         for line in f:
-            tokens = line.split()
-            
-            label = tokens[-1]
-            tweet = ' '.join(tokens[:-1])
-            documents.append(tweet)
-            labels.append(label)
+            tokens = line.strip()
+            documents.append(" ".join(tokens.split()[3:]).strip())
+            # 6-class problem: books, camera, dvd, health, music, software
+            labels.append(tokens.split()[0])
 
     return documents, labels
 
 
-def read_embeddings(embeddings_file: str):
+def read_embeddings(embeddings_file: str) -> dict[str, np.ndarray]:
     """Reads in word embeddings from file and save as numpy array."""
 
     embeddings = json.load(open(embeddings_file, 'r'))
     return {word: np.array(embeddings[word]) for word in embeddings}
 
 
-def get_emb_matrix(voc, emb):
+def get_emb_matrix(voc, emb) -> np.ndarray[float]:
     """Creates embedding matrix given vocab and the embeddings."""
 
     num_tokens = len(voc) + 2
@@ -95,13 +86,13 @@ def get_emb_matrix(voc, emb):
     return embedding_matrix
 
 
-def create_model(Y_train: list[str], emb_matrix) -> Sequential:
+def create_model(Y_train: list[str], emb_matrix: np.ndarray[float]) -> Sequential:
     """Creates the bidirectional LSTM model."""
 
     # Hyperparameters
     HIDDEN_UNITS = 64
     LEARNING_RATE = 0.01
-    LOSS_FUNCTION = "binary_crossentropy"
+    LOSS_FUNCTION = "categorical_crossentropy"
     OPTIM = Adam(learning_rate=LEARNING_RATE)
 
     # Take embedding dim and size from emb_matrix
@@ -116,9 +107,9 @@ def create_model(Y_train: list[str], emb_matrix) -> Sequential:
     model.add(
         Bidirectional(LSTM(units=HIDDEN_UNITS, return_sequences=False, recurrent_dropout=0.1))
     )
-    model.add(Dense(input_dim=embedding_dim, units=1, activation='sigmoid'))
+    model.add(Dropout(0.1))
+    model.add(Dense(input_dim=embedding_dim, units=num_labels, activation="softmax"))
 
-    # TODO: Implement with different loss metric
     model.compile(loss=LOSS_FUNCTION, optimizer=OPTIM, metrics=["accuracy"])
 
     return model
@@ -131,9 +122,9 @@ def train_model(model: Sequential,
 
     VERBOSE = 1
     BATCH_SIZE = 25
-    EPOCHS = 3
+    EPOCHS = 50
 
-    callback = EarlyStopping(monitor="val_loss", patience=3)
+    callback = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=3)
     model.fit(
         X_train,
         Y_train,
@@ -147,37 +138,15 @@ def train_model(model: Sequential,
 
     return model
 
-def custom_argmax(value,threshold=0.5):
-    if value >= threshold:
-        return 1
-    else:
-        return 0
-
 
 def test_set_predict(model: Sequential, X_test: list[str], Y_test: list[str], ident: str) -> None:
     """Measure accuracy on own test set, which is a subset of the training data."""
 
-    Y_pred = [custom_argmax(value) for value in model.predict(X_test)]
+    Y_pred = np.argmax(model.predict(X_test), axis=1)
+    Y_test = np.argmax(Y_test, axis=1)
 
-
-    formatted_acc = accuracy_score(Y_test, Y_pred)
+    formatted_acc = round(accuracy_score(Y_test, Y_pred), 3)
     print(f"Accuracy on own {ident} set: {formatted_acc}")
-
-    formatted_prec = round(precision_score(Y_test, Y_pred, average='macro'), 3)
-    print(f"Precision on own {ident} set: {formatted_prec}")
-
-    formatted_rec = round(recall_score(Y_test, Y_pred, average='macro'), 3)
-    print(f"Precision on own {ident} set: {formatted_rec}")
-
-    formatted_f1 = round(f1_score(Y_test, Y_pred, average='macro'), 3)
-    print(f"F1 on own {ident} set: {formatted_f1}")
-
-    if ident == "test":
-        conf_matrix = confusion_matrix(Y_test, Y_pred)
-        print('Confusion Matrix:')
-        print(conf_matrix)
-        with open('confusion_matrix.pkl', 'wb') as file:
-            pickle.dump(conf_matrix, file)
 
 
 def main() -> None:
@@ -188,7 +157,6 @@ def main() -> None:
     # Read in the data and embeddings
     X_train, Y_train = read_corpus(args.train_file)
     X_dev, Y_dev = read_corpus(args.dev_file)
-    
     embeddings = read_embeddings(args.embeddings)
 
     # Transform words to indices using a vectorizer
@@ -223,6 +191,10 @@ def main() -> None:
         X_test_vect = vectorizer(np.array([[s] for s in X_test])).numpy()
         # Finally do the predictions
         test_set_predict(model, X_test_vect, Y_test_bin, "test")
+
+        y_prediction = model.predict(X_test_vect)
+        print('test')
+        print(confusion_matrix(Y_test, y_prediction, normalize='pred'))
 
 
 if __name__ == "__main__":
