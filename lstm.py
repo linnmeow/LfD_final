@@ -114,12 +114,16 @@ def create_model(Y_train: list[str], emb_matrix) -> Sequential:
         Embedding(num_tokens, embedding_dim, embeddings_initializer=Constant(emb_matrix), trainable=False)
     )
     model.add(
-        Bidirectional(LSTM(units=HIDDEN_UNITS, return_sequences=False, recurrent_dropout=0.1))
-    )
+        LSTM(units=HIDDEN_UNITS, return_sequences=False, recurrent_dropout=0.5))
+    
+    model.add(Dropout(0.8))
+
     model.add(Dense(input_dim=embedding_dim, units=1, activation='sigmoid'))
 
     # TODO: Implement with different loss metric
-    model.compile(loss=LOSS_FUNCTION, optimizer=OPTIM, metrics=["accuracy"])
+    model.compile(loss=LOSS_FUNCTION, optimizer=OPTIM, metrics=[tf.keras.metrics.Recall(
+    thresholds=None, top_k=None, class_id=None, name=None, dtype=None
+)])
 
     return model
 
@@ -131,7 +135,7 @@ def train_model(model: Sequential,
 
     VERBOSE = 1
     BATCH_SIZE = 25
-    EPOCHS = 3
+    EPOCHS = 20
 
     callback = EarlyStopping(monitor="val_loss", patience=3)
     model.fit(
@@ -167,7 +171,7 @@ def test_set_predict(model: Sequential, X_test: list[str], Y_test: list[str], id
     print(f"Precision on own {ident} set: {formatted_prec}")
 
     formatted_rec = round(recall_score(Y_test, Y_pred, average='macro'), 3)
-    print(f"Precision on own {ident} set: {formatted_rec}")
+    print(f"Recall on own {ident} set: {formatted_rec}")
 
     formatted_f1 = round(f1_score(Y_test, Y_pred, average='macro'), 3)
     print(f"F1 on own {ident} set: {formatted_f1}")
