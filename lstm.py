@@ -118,22 +118,15 @@ def create_model(Y_train: list[str], emb_matrix) -> Sequential:
     model.add(
         Embedding(num_tokens, embedding_dim, embeddings_initializer=Constant(emb_matrix), trainable=False)
     )
+
     model.add(
-        LSTM(units=HIDDEN_UNITS, return_sequences=False, recurrent_dropout=0.5))
-    
+        LSTM(units=HIDDEN_UNITS, return_sequences=False, recurrent_dropout=0.5)
+    )
+
     model.add(Dropout(0.8))
 
-    model.add(LSTM(units=HIDDEN_UNITS))
-    print(model.summary())  # For debugging
+    model.add(Dense(input_dim=10, units=1, activation='sigmoid'))
 
-    model.add(Dense(input_dim=HIDDEN_UNITS, units=2))
-    print(model.summary())  # For debugging
-
-    model.add(Activation('tanh'))
-    print(model.summary())  # For debugging
-
-    # model.add(Dense(input_dim=10, units=1, activation='sigmoid'))
-    # print(model.summary())  # For debugging
 
     # TODO: Implement with different loss metric
     model.compile(loss=LOSS_FUNCTION, optimizer=OPTIM, metrics=[tf.keras.metrics.Recall(
