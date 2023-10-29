@@ -19,7 +19,7 @@ import random as py_random
 import numpy as np
 import tensorflow as tf
 from keras.models import Sequential
-from keras.layers import Dense, Embedding, LSTM, Bidirectional, Dropout
+from keras.layers import Dense, Embedding, LSTM, Bidirectional, Dropout, Activation
 from keras.initializers import Constant
 from sklearn.metrics import accuracy_score, recall_score, precision_score, precision_recall_curve, f1_score, confusion_matrix
 from sklearn.preprocessing import LabelBinarizer
@@ -61,7 +61,7 @@ def read_corpus(corpus_file: str) -> tuple[list[str], list[str]]:
     with open(corpus_file, encoding="utf-8") as f:
         for line in f:
             tokens = line.split()
-            
+
             label = tokens[-1]
             tweet = ' '.join(tokens[:-1])
             documents.append(tweet)
@@ -105,9 +105,14 @@ def create_model(Y_train: list[str], emb_matrix) -> Sequential:
     OPTIM = Adam(learning_rate=LEARNING_RATE)
 
     # Take embedding dim and size from emb_matrix
-    embedding_dim = len(emb_matrix[0])
+    embedding_dim = len(emb_matrix[0])  # 300
+    print(f"Embedding dim: {embedding_dim}")  # For debugging
+
     num_tokens = len(emb_matrix)
+    print(f"Num tokens: {num_tokens}")  # For debugging
+
     num_labels = len(set(Y_train))
+    print(f"Num labels: {num_labels}")  # For debugging
 
     model = Sequential()
     model.add(
@@ -118,7 +123,17 @@ def create_model(Y_train: list[str], emb_matrix) -> Sequential:
     
     model.add(Dropout(0.8))
 
-    model.add(Dense(input_dim=embedding_dim, units=1, activation='sigmoid'))
+    model.add(LSTM(units=HIDDEN_UNITS))
+    print(model.summary())  # For debugging
+
+    model.add(Dense(input_dim=HIDDEN_UNITS, units=2))
+    print(model.summary())  # For debugging
+
+    model.add(Activation('tanh'))
+    print(model.summary())  # For debugging
+
+    # model.add(Dense(input_dim=10, units=1, activation='sigmoid'))
+    # print(model.summary())  # For debugging
 
     # TODO: Implement with different loss metric
     model.compile(loss=LOSS_FUNCTION, optimizer=OPTIM, metrics=[tf.keras.metrics.Recall(
@@ -192,7 +207,7 @@ def main() -> None:
     # Read in the data and embeddings
     X_train, Y_train = read_corpus(args.train_file)
     X_dev, Y_dev = read_corpus(args.dev_file)
-    
+
     embeddings = read_embeddings(args.embeddings)
 
     # Transform words to indices using a vectorizer
