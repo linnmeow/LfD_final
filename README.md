@@ -43,9 +43,9 @@ The following dependencies are required to use the LSTM module:
 
 Run the lstm.py file using the following command:
 
-''' 
+```
 python lstm.py
-''' 
+``` 
 
 This command will use the default training and development files, as well as print out training and validation performance metrics.
 The default training and development files are data/train_clean.tsv and data/dev_clean.tsv, respectively.
