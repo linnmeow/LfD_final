@@ -65,7 +65,10 @@ python lstm.py -i data/my_training_data.tsv
 ```
 python lstm.py -d data/my_dev_data.tsv
 ```
-
+* -s or --sentiment: To train with sentiment analysis as a feature, use the -s argument followed by 'True', as well as specifying a path to training and development datasets that include sentiment in the correct format. We have included such files in the 'data' folder.
+```
+python lstm.py -i 'data/train_with_sentiment.tsv' -d 'data/dev_with_sentiment.tsv' -s True
+```
 #### Testing
 
 If you want to train the model and evaluate it on a test set, you can use the -t argument followed by the path to your test set file. For example:
