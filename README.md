@@ -51,8 +51,33 @@ This command will use the default training and development files, as well as pri
 The default training and development files are data/train_clean.tsv and data/dev_clean.tsv, respectively.
 
 
+#### Optional Arguments
 
+You can specify the input training and development files using the following optional command-line arguments:
 
+* -i or --input: To specify the training file, use the -i argument followed by the path to your training file. For example:
+
+```
+python lstm.py -i data/my_training_data.tsv
+```
+
+* -d or --dev: To specify the development file, use the -d argument followed by the path to your development file. For example:
+```
+python lstm.py -d data/my_dev_data.tsv
+```
+
+#### Testing
+
+If you want to train the model and evaluate it on a test set, you can use the -t argument followed by the path to your test set file. For example:
+
+```
+python lstm.py -t data/my_test_data.tsv
+```
+By specifying the test set, the code will train the model on the training data, evaluate it on the development data, and finally test it on the provided test set.
+
+#### Output
+
+The code will output performance metrics and model evaluation results to the console
 
     - How to **train** all models on the data
     - Output files for each experiment on which you report results in the paper
