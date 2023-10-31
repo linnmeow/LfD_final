@@ -1,5 +1,7 @@
 # LfD_final
-## Dependencies
+
+## SVM
+### Dependencies
 
 The following dependencies are required to use the SVM modules:
 
@@ -10,6 +12,7 @@ The following dependencies are required to use the SVM modules:
 - [numpy](https://numpy.org) - Version 1.26.1
 - [pandas](https://pandas.pydata.org) - Version 2.1.1
 - [scipy](https://scipy.org) - Version 1.11.3
+
 
 ### Other Dependencies
 
@@ -23,6 +26,29 @@ The SVM modules may also depend on the following libraries to support its functi
 - [MarkupSafe](https://pypi.org/project/MarkupSafe/) - Version 2.1.3
 - [mpmath](https://pypi.org/project/mpmath/) - Version 1.3.0
 - [networkx](https://pypi.org/project/networkx/) - Version 3.2
+
+
+## LSTM
+
+### Dependencies
+
+The following dependencies are required to use the LSTM module:
+
+- [numpy](https://numpy.org) - Version 1.26.1
+- [tensorflow](https://www.tensorflow.org/install) - Version 2.13.0
+- [keras](https://keras.io/getting_started/) - Version 2.13.1
+- [sklearn](https://scikit-learn.org/stable/) - Version 1.3.2
+
+### Usage
+
+Run the lstm.py file using the following command:
+
+$
+python lstm.py
+$
+
+
+
 
 
 
