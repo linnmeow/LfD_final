@@ -3,14 +3,23 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 # nltk.download('vader_lexicon')
 
 class SentimentDataLoader:
-    def __init__(self, corpus_file, use_sentiment_score=False, use_sentiment_label=False):
+    def __init__(self, corpus_file):
         self.corpus_file = corpus_file
-        self.use_sentiment_score = use_sentiment_score
-        self.use_sentiment_label = use_sentiment_label
         self.sentiment_analyzer = SentimentIntensityAnalyzer()
         self.string_documents = []
         self.tokenized_documents = []
-        self.labels = [] 
+        self.labels = []
+        self.sentiment_labels = []
+        self.sentiment_scores = [] 
+    
+    @ staticmethod
+    def class_to_int(label):
+        if label == 'NOT':
+            return 0
+        elif label == 'OFF':
+            return 1
+        else:
+            raise ValueError("Invalid label.")
     
     def load_data(self):
         with open(self.corpus_file, encoding='utf-8') as in_file:
@@ -19,40 +28,53 @@ class SentimentDataLoader:
                 # split the line into tokens, get the tokenized text without labels
                 tokens = line.strip().split()[:-1]
 
+                # get the label from the line
+                label = line.strip().split()[-1]
+
+                # apply the class_to_int function to convert the labels to numerical values
+                label_numeric = self.class_to_int(label)
+
                 # append the labels to the list
-                self.labels.append(line.strip().split()[-1])
+                self.labels.append(label_numeric)
 
                 # get string texts for character information extraction
                 text = ' '.join(tokens)
 
-                if self.use_sentiment_score:
-                    # calculate the sentiment score
-                    compound_score = self.sentiment_analyzer.polarity_scores(text)['compound']
+                # calculate the sentiment score
+                compound_score = self.sentiment_analyzer.polarity_scores(text)['compound']
 
-                    # append the compound score as a token
-                    tokens.append(str(compound_score))
-                    text = text + ' ' + str(compound_score)
+                # append the sentiment score 
+                self.sentiment_scores.append(compound_score)
 
-                if self.use_sentiment_label:
-                    # calculate the sentiment label (binary pos or neg)
-                    compound_score = self.sentiment_analyzer.polarity_scores(text)['compound']
-                    sentiment_label = 'pos' if compound_score >= 0 else 'neg'
+                # pos labeled as 0 and neg labeled as 1
+                sentiment_label = 0 if compound_score >= 0 else 1 
+                # append the sentiment label
+                self.sentiment_labels.append(sentiment_label)
 
-                    # append the sentiment label as a token
-                    tokens.append(sentiment_label)
-                    text = text + ' ' + sentiment_label
-
-                # append both the string and tokenized documents
                 self.string_documents.append(text)
-                self.tokenized_documents.append(tokens)               
+                self.tokenized_documents.append(tokens)  
+
+    def calculate_label_overlap(self):
+        if len(self.labels) != len(self.sentiment_labels):
+            raise ValueError("The lengths of labels and sentiment_labels must be the same.")
+
+        overlap_count = sum(1 for label, sentiment_label in zip(self.labels, self.sentiment_labels) if label == sentiment_label)
+        overlap_percentage = (overlap_count / len(self.labels)) * 100
+
+        return overlap_count, overlap_percentage             
 
     def get_data(self):
-        return self.string_documents, self.tokenized_documents, self.labels
+        return self.string_documents, self.tokenized_documents, self.labels, self.sentiment_labels, self.sentiment_scores
+    
 
 if __name__ == "__main__":
     
-    data_loader = SentimentDataLoader('dev_clean.tsv', use_sentiment_label=True, use_sentiment_score=True)
+    data_loader = SentimentDataLoader('test_clean.tsv')
     data_loader.load_data()
-    string_documents, tokenized_documents, labels = data_loader.get_data()
+    string_documents, tokenized_documents, labels, sentiment_labels, sentiment_scores = data_loader.get_data()
 
-    print(string_documents[:3])
+    # print(labels[:3])
+
+    overlap_count, overlap_percentage = data_loader.calculate_label_overlap()
+    print(f"Overlap count: {overlap_count}")
+    print(f"Overlap percentage: {overlap_percentage:.2f}%")
