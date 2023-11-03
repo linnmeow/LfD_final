@@ -10,7 +10,6 @@ from nltk.stem import PorterStemmer
 class Preprocessor:
     def __init__(self, file_path):
         self.file_path = file_path
-        self.token_frequencies = {} 
         self.load_data()
         self.stemmer = PorterStemmer()
 
@@ -22,23 +21,28 @@ class Preprocessor:
         # convert text to lowercase, remove frequent words like @USER and URL,
         # remove punctuation, remove everything that isn't letters,
         # and convert emojis to their textual descriptions
+        # split hashtag and converted emojis 
         assert isinstance(text, str), "This function only takes strings."
         
         text = re.sub(r'@USER\s*', '', text) # there is whitespce after @USER
         text = re.sub(r'URL\s*', '', text)
         text = emoji.demojize(text)  # convert emojis to text
-        text = re.sub(r'::', ': :', text) # add spaces after each emoji representation
+        text = re.sub(r'[:_]+', ' ', text) # use underscore to split emojis
+        text = re.sub(r'#([A-Z][a-z]+)([A-Z][a-z]+)+', r' \1 \2', text) # split token after hashtags
         text = re.sub('[^A-Za-z ]+', '', text)  # remove everything that isn't letters including punctuation
+        
         text = text.lower() # lowercasing
         text = text.strip()
         return text
     
-    def remove_duplicate_tokens(self, text):
+    @ staticmethod
+    def remove_duplicate_tokens(text):
         tokens = text.split()
         new_tokens = []
+        token_frequencies = {} 
         for token in tokens:
-            if self.token_frequencies.get(token, 0) == 0:
-                self.token_frequencies[token] = 1
+            if token_frequencies.get(token, 0) == 0:
+                token_frequencies[token] = 1
                 new_tokens.append(token)
         return ' '.join(new_tokens)
     
@@ -77,8 +81,8 @@ class Preprocessor:
 
 if __name__ == "__main__":
 
-    input_tsv_file = "test.tsv"
-    output_tsv_file = "test_clean.tsv"
+    input_tsv_file = "dev.tsv"
+    output_tsv_file = "dev_clean.tsv"
 
     preprocessor = Preprocessor(input_tsv_file)
     preprocessor.apply_preprocessing()
