@@ -30,6 +30,7 @@ class DataVisualizer:
 
     def visualize_label_distribution(self):
         sentiment_distribution = self.data[1].value_counts() # labels in the second column
+        print(sentiment_distribution)
         sentiment_distribution.plot(kind='bar')
         plt.xlabel('Labels')
         plt.ylabel('Count')
@@ -37,7 +38,7 @@ class DataVisualizer:
     
 if __name__ == "__main__":
 
-    file_path = 'test.tsv'
+    file_path = 'dev.tsv'
     visualizer = DataVisualizer(file_path)
     visualizer.visualize_word_cloud()
     visualizer.visualize_word_frequencies()
