@@ -1,7 +1,7 @@
 # LfD_final
 
-## SVM
-### Dependencies
+## Dependencies
+
 
 The following dependencies are required to use the SVM modules:
 
@@ -14,19 +14,11 @@ The following dependencies are required to use the SVM modules:
 - [scipy](https://scipy.org) - Version 1.11.3
 
 
-### Other Dependencies
-
-The SVM modules may also depend on the following libraries to support its functionality. While they are not directly required for basic usage, they may be used in the underlying code:
-
-- [smart-open](https://pypi.org/project/smart-open/) - Version 6.4.0
-- [filelock](https://pypi.org/project/filelock/) - Version 3.12.4
-- [fsspec](https://pypi.org/project/fsspec/) - Version 2023.10.0
-- [Jinja2](https://pypi.org/project/Jinja2/) - Version 3.1.2
-- [joblib](https://pypi.org/project/joblib/) - Version 1.3.2
-- [MarkupSafe](https://pypi.org/project/MarkupSafe/) - Version 2.1.3
-- [mpmath](https://pypi.org/project/mpmath/) - Version 1.3.0
-- [networkx](https://pypi.org/project/networkx/) - Version 3.2
-
+## Training the models
+### SVM
+- to train the SVM baseline model, run python SVM_classifier.py -ch --svm2 --train_file train.tsv
+- to evaluate the model, run the SVM_evaluator and provide the correct model name (set evaluate_fasttext_classifier to False)
+### LSTM
 
 
 
