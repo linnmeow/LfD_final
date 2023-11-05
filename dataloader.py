@@ -2,7 +2,7 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import numpy as np
 import nltk
 
-nltk.download('vader_lexicon')
+# nltk.download('vader_lexicon')
 
 class SentimentDataLoader:
     def __init__(self, corpus_file):
@@ -74,7 +74,6 @@ if __name__ == "__main__":
     data_loader = SentimentDataLoader('test_clean.tsv')
     data_loader.load_data()
     string_documents, tokenized_documents, labels, labels_bin, sentiment_labels, sentiment_scores = data_loader.get_data()
-    print(sentiment_labels[:3])
 
     overlap_count, overlap_percentage = data_loader.calculate_label_overlap()
     print(f"Overlap count: {overlap_count}")
