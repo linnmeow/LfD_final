@@ -30,7 +30,7 @@ The SVM modules may also depend on the following libraries to support its functi
 ## Training the models
 ### SVM
 - to train the SVM baseline model, run python SVM_classifier.py -ch --svm2 --train_file train.tsv
-- to evaluate the model, run the SVM_evaluator passing in the correct model name
+- to evaluate the model, run the SVM_evaluator and provide the correct model name
 ### LSTM
 
 
