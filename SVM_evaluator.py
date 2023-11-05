@@ -1,9 +1,9 @@
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 import pickle
-import fasttext
 from dataloader import SentimentDataLoader
-from classifier_fasttext import TextClassifierFastText
+from SVM_classifier_fasttext import TextClassifierFastText
 from SVM_classifier import identity
+import json
 
 
 class Evaluator:
@@ -25,12 +25,13 @@ class Evaluator:
 
     def evaluate_classifier(self):
         if self.evaluate_fasttext_classifier:
-            # if evaluating a FastText-based classifier
-            model_path = 'crawl-300d-2M-subword.bin'
-            model = fasttext.load_model(model_path)
-            classifier = TextClassifierFastText(model_path)
-            test_embeddings = classifier.get_sentence_embeddings(self.test_data, model)
-            predictions = self.classifier.predict(test_embeddings)
+                # if evaluating a FastText-based classifier
+                with open('fasttext_embeddings.json', 'r') as embeddings_file:
+                    embeddings_dict = json.load(embeddings_file)
+                
+                classifier = TextClassifierFastText(embeddings_dict)
+                test_embeddings = classifier.get_sentence_embeddings(self.test_data)
+                predictions = self.classifier.predict(test_embeddings)
 
         else:
             # if evaluating a different classifier
@@ -54,10 +55,10 @@ class Evaluator:
 
 if __name__ == "__main__":
     # create an Evaluator instance
-    evaluator = Evaluator(evaluate_fasttext_classifier=False)
+    evaluator = Evaluator(evaluate_fasttext_classifier=True)
 
     # load the saved model
-    evaluator.load_classifier('TF-IDF_char_Linear SVM.pkl')  
+    evaluator.load_classifier('SVM_fasttext_model.pkl')  
 
     # load test data
     test_loader = SentimentDataLoader('test.tsv')
