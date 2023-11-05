@@ -57,10 +57,10 @@ class SentimentDataLoader:
                 self.tokenized_documents.append(tokens)  
 
     def calculate_label_overlap(self):
-        if len(self.labels) != len(self.sentiment_labels):
+        if len(self.labels_bin) != len(self.sentiment_labels):
             raise ValueError("The lengths of labels and sentiment_labels must be the same.")
 
-        overlap_count = sum(1 for label, sentiment_label in zip(self.labels, self.sentiment_labels) if label == sentiment_label)
+        overlap_count = sum(1 for label, sentiment_label in zip(self.labels_bin, self.sentiment_labels) if label == sentiment_label)
         overlap_percentage = (overlap_count / len(self.labels)) * 100
 
         return overlap_count, overlap_percentage             
@@ -74,6 +74,7 @@ if __name__ == "__main__":
     data_loader = SentimentDataLoader('test_clean.tsv')
     data_loader.load_data()
     string_documents, tokenized_documents, labels, labels_bin, sentiment_labels, sentiment_scores = data_loader.get_data()
+    print(sentiment_labels[:3])
 
     overlap_count, overlap_percentage = data_loader.calculate_label_overlap()
     print(f"Overlap count: {overlap_count}")
