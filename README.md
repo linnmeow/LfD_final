@@ -17,7 +17,7 @@ The following dependencies are required to use the SVM modules:
 ## Training the models
 ### SVM
 - to train the SVM baseline model, run python SVM_classifier.py -ch --svm2 --train_file train.tsv
-- to evaluate the model, run the SVM_evaluator and provide the correct model name
+- to evaluate the model, run the SVM_evaluator and provide the correct model name (set evaluate_fasttext_classifier to False)
 ### LSTM
 
 
