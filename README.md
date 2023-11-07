@@ -26,6 +26,8 @@ The following dependencies are required to use bert.py:
 - [spacy](https://pypi.org/project/spacy/) - Version 3.6.1
 - [scipy](https://pypi.org/project/scipy/) - Version 1.11.3
 - (I trained the models on own device, clusters, google colab respectively, that is why the dependencies are slightly different.)
+## Preprocessing the data
+- to preprocess the data, run preprocessor.py with the correct paths in the main block
 
 ## Training the models
 ### SVM
