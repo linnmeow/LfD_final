@@ -26,9 +26,9 @@ def create_arg_parser():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-i", "--train_file", default="data/train_clean.tsv", type=str,
-                        help="Input file to learn from (default train_clean.txt)")
-    parser.add_argument("-d", "--dev_file", type=str, default="data/dev_clean.tsv",
+    parser.add_argument("-i", "--train_file", default="train.tsv", type=str,
+                        help="Input file to learn from (default train.txt)")
+    parser.add_argument("-d", "--dev_file", type=str, default="dev.tsv",
                         help="Separate dev set to read in (default dev.txt)")
     parser.add_argument("-t", "--test_file", type=str,
                         help="If added, use trained model to predict on test set")
@@ -46,7 +46,6 @@ def read_embeddings(embeddings_file):
 
 
 def get_emb_matrix(voc, emb):
-    # old function from assignment 3
 
     num_tokens = len(voc) + 2
     word_index = dict(zip(voc, range(len(voc))))
@@ -62,8 +61,8 @@ def get_emb_matrix(voc, emb):
 
 
 def create_model(emb_matrix, hidden_units, loss_function, optim, recurrent_dropout, dropout):
-
-    # Take embedding dim and size from emb_matrix
+    
+    # take embedding dim and size from emb_matrix
     embedding_dim = len(emb_matrix[0]) 
     num_tokens = len(emb_matrix)
 
@@ -104,8 +103,7 @@ def train_model(model, X_train, Y_train, X_dev, Y_dev, verbose, batch_size, epoc
     return model
 
 def test_set_predict(model, X_test, Y_test, ident):
-
-    
+ 
     Y_pred = list(map(lambda value: 1 if value >= 0.5 else 0, model.predict(X_test)))
 
     f1_result = round(f1_score(Y_test, Y_pred, average='macro'), 3)
@@ -146,12 +144,12 @@ def main():
 
     embeddings = read_embeddings(args.embeddings)
 
-    # Transform words to indices using a vectorizer
+    # transform words to indices using a vectorizer
     vectorizer = TextVectorization(standardize=None, output_sequence_length=50)
-    # Use train and dev to create vocab - could also do just train
+    # create vocab
     text_ds = tf.data.Dataset.from_tensor_slices(X_train + X_dev)
     vectorizer.adapt(text_ds)
-    # Dictionary mapping words to idx
+    # dictionary mapping words to idx
     voc = vectorizer.get_vocabulary()
     emb_matrix = get_emb_matrix(voc, embeddings)
 
@@ -163,14 +161,14 @@ def main():
     # create model
     model = create_model(emb_matrix, hidden_units=hidden_units, loss_function=loss_function, optim=optim, recurrent_dropout=recurrment_dropout, dropout=dropout)
 
-    # Transform input to vectorized input
+    # transform input to vectorized input
     X_train_vect = vectorizer(np.array([[s] for s in X_train])).numpy()
     X_dev_vect = vectorizer(np.array([[s] for s in X_dev])).numpy()
 
-    # Train the model
+    # train the model
     model = train_model(model, X_train_vect, Y_train_bin, X_dev_vect, Y_dev_bin, verbose=verbose, batch_size=batch_size, epochs=epochs)
 
-    # Determine the model name based on the argument
+    # determine the model name based on the argument
     if "fasttext" in args.embeddings:
         model_name = 'fasttext'
     elif "glove" in args.embeddings:
@@ -178,12 +176,12 @@ def main():
     else:
         model_name = 'vanilla'
 
-    # Save the trained model with the appropriate name
+    # save the trained model with the appropriate name
     saved_model_name = f'{model_name}_model.h5'
     model.save(f'{model_name}_model.h5')
     print(f"Model saved as: {saved_model_name}")
 
-    # Do predictions on specified test set
+    # do predictions on specified test set
     if args.test_file:
 
         # read in the training data using dataloader
@@ -193,7 +191,7 @@ def main():
 
         Y_test_bin = encoder.transform(Y_test)
         X_test_vect = vectorizer(np.array([[s] for s in X_test])).numpy()
-        # Finally do the predictions
+        
         test_set_predict(model, X_test_vect, Y_test_bin, "test")
 
 if __name__ == "__main__":
