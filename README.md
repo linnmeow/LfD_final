@@ -6,12 +6,17 @@
 The following dependencies are required to use the SVM modules:
 
 - [fasttext](https://fasttext.cc) - Version 0.9.2
-- [emoji](https://pypi.org/project/emoji/) - Version 2.8.0
 - [scikit-learn](https://scikit-learn.org/stable/) - Version 1.3.2
 - [nltk](https://www.nltk.org) - Version 3.8.1
 - [numpy](https://numpy.org) - Version 1.26.1
-- [pandas](https://pandas.pydata.org) - Version 2.1.1
 - [scipy](https://scipy.org) - Version 1.11.3
+
+The following dependencies are required to use lstm.py:
+- [tensorflow](https://www.tensorflow.org/api_docs/python/tf) - Version 2.12.0
+- [scikit-learn](https://scikit-learn.org/stable/) - Version 1.3.0
+- [transformers](https://pypi.org/project/transformers/) - Version 4.35.0
+- [numpy](https://numpy.org) - Version 1.23.5
+- [scipy](https://pypi.org/project/scipy/) - Version 1.11.3
 
 
 ## Training the models
