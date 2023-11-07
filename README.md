@@ -32,6 +32,9 @@ The following dependencies are required to use bert.py:
 - to train the SVM baseline model, run python SVM_classifier.py -ch --svm2 --train_file train.tsv
 - to evaluate the model, run the SVM_evaluator and provide the correct model name (set evaluate_fasttext_classifier to False)
 ### LSTM
+- example usage for using lstm.py: python lstm.py -i train.tsv -d dev.tsv -e glove_embeddings
+### BERT
+- example usage for using bert.py: python bert.py -m bert-base-uncased -i train.tsv -d dev.tsv
 
 
 
