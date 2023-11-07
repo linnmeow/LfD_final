@@ -35,10 +35,3 @@ The following dependencies are required to use bert.py:
 - example usage for using lstm.py: python lstm.py -i train.tsv -d dev.tsv -e glove_embeddings
 ### BERT
 - example usage for using bert.py: python bert.py -m bert-base-uncased -i train.tsv -d dev.tsv
-
-
-
-    - How to **train** all models on the data
-    - Output files for each experiment on which you report results in the paper
-    - File that runs evaluation of input and output file
-    - All relevant code that you used to train/evaluate/analyse models
