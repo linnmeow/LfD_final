@@ -25,7 +25,7 @@ The following dependencies are required to use bert.py:
 - [torch](https://pypi.org/project/torch/) - Version 2.1.0+cu118
 - [spacy](https://pypi.org/project/spacy/) - Version 3.6.1
 - [scipy](https://pypi.org/project/scipy/) - Version 1.11.3
-(I trained the models on own device, cluster, google colab respectively, that is why the dependencies are slightly different.)
+- (I trained the models on own device, cluster, google colab respectively, that is why the dependencies are slightly different.)
 
 ## Training the models
 ### SVM
