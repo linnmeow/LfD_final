@@ -18,6 +18,14 @@ The following dependencies are required to use lstm.py:
 - [numpy](https://numpy.org) - Version 1.23.5
 - [scipy](https://pypi.org/project/scipy/) - Version 1.11.3
 
+The following dependencies are required to use bert.py:
+- [tensorflow](https://www.tensorflow.org/api_docs/python/tf) - Version 2.14.0
+- [scikit-learn](https://scikit-learn.org/stable/) - Version 1.2.2
+- [transformers](https://pypi.org/project/transformers/) - Version 4.35.0
+- [torch](https://pypi.org/project/torch/) - Version 2.1.0+cu118
+- [spacy](https://pypi.org/project/spacy/) - Version 3.6.1
+- [scipy](https://pypi.org/project/scipy/) - Version 1.11.3
+
 
 ## Training the models
 ### SVM
