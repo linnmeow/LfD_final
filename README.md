@@ -5,7 +5,7 @@
 
 The following dependencies are required to use the SVM modules:
 
-- [fasttext](https://fasttext.cc) - Version 0.9.2
+- [fasttext] - Version 0.9.2
 - [scikit-learn](https://scikit-learn.org/stable/) - Version 1.3.2
 - [nltk](https://www.nltk.org) - Version 3.8.1
 - [numpy](https://numpy.org) - Version 1.26.1
