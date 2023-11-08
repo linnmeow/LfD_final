@@ -1,6 +1,8 @@
 import argparse
 import numpy as np
 import torch
+import os
+import pandas as pd
 from dataloader_bert import BertDataLoader
 from sklearn.preprocessing import LabelBinarizer
 import torch.nn.functional as F
@@ -92,16 +94,16 @@ def train_model(model, train_loader, dev_loader, optimizer, loss_function, num_e
             if macro_f1 > best_macro_f1:
                 best_macro_f1 = macro_f1
                 best_model_epoch = epoch + 1
-                best_model_save_path = f'best_model.pth'
-                torch.save(model.state_dict(), best_model_save_path)
-                print(f"Saved best model to {best_model_save_path}")
+                # best_model_save_path = f'best_model.pth'
+                # torch.save(model.state_dict(), best_model_save_path)
+                # print(f"Saved best model to {best_model_save_path}")
 
             class_report = classification_report(all_true_labels, all_predicted_labels, target_names=['class_0', 'class_1'])
             print(class_report)
 
     print(f"Best model based on Macro F1 Score: Epoch {best_model_epoch}, Macro F1 Score: {best_macro_f1:.4f}")
   
-def test_model(model, test_loader, device):
+def test_model(model, test_loader, device,  model_name, data_file_name):
     model.to(device)
     model.eval()
 
@@ -128,6 +130,17 @@ def test_model(model, test_loader, device):
     print(f"Macro F1 on test set: {macro_f1:.4f}")
     print(class_report)
 
+    # create the output directory if it doesn't exist
+    output_directory = 'predicted_labels_google'
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
+
+    # save the predicted labels to an output file with model name and data file name
+    output_file = f"predicted_labels_{model_name}_{data_file_name}.csv"
+    pd.DataFrame(all_predicted_labels, columns=['Predicted_Label']).to_csv(output_file, index=False)
+    print(f"Predicted labels saved to {output_file}")
+
+
 def main():
     args = create_arg_parser()
 
@@ -153,18 +166,18 @@ def main():
     Y_dev_bin = encoder.transform(Y_dev)
 
     # define data loaders
-    batch_size = 16
+    batch_size = 64
     train_dataset = TensorDataset(tokens_train["input_ids"], tokens_train["attention_mask"], torch.tensor(Y_train_bin, dtype=torch.float32))
     dev_dataset = TensorDataset(tokens_dev["input_ids"], tokens_dev["attention_mask"], torch.tensor(Y_dev_bin, dtype=torch.float32))
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     dev_loader = DataLoader(dev_dataset, batch_size=batch_size)
 
     # define optimizer and loss function
-    optimizer = torch.optim.AdamW(model.parameters(), lr=5e-6)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-5)
     loss_function = torch.nn.BCEWithLogitsLoss()
 
     # define other training parameters like num_epochs and device
-    num_epochs = 5
+    num_epochs = 3
     device = check_gpu()  # implement the check_gpu function to choose CPU or GPU
 
     # train model
@@ -185,8 +198,8 @@ def main():
         test_dataset = TensorDataset(tokens_test["input_ids"], tokens_test["attention_mask"], torch.tensor(Y_test_bin, dtype=torch.float32))
         test_loader = DataLoader(test_dataset, batch_size=batch_size)
 
-        # evaluate the model on the test set
-        test_model(model, test_loader, device)
+        # call test_model and save labels
+        test_model(model, test_loader, device, model_name, args.test_file)
 
 if __name__ == '__main__':
     main()
